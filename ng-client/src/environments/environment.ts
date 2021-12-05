@@ -5,7 +5,9 @@
 export const environment = {
   production: false,
   signupEndpoint: '/auth/api/register',
-  loginEndpoint: '/auth/api/login'
+  loginEndpoint: '/auth/api/login',
+  activitiesEndpoint: '/data/matific-test-activities',
+  classesEndpoint: '/data/matific-test-classes'
 };
 
 /*

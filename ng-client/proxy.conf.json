@@ -5,5 +5,12 @@
     "pathRewrite": {
       "/auth": ""
     }
+  },
+  "/data/": {
+    "target": "https://ljifg6p8cd.execute-api.us-east-1.amazonaws.com/production",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "/data": ""
+    }
   }
 }
