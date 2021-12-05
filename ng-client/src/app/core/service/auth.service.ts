@@ -2,8 +2,8 @@ import {Injectable} from '@angular/core';
 import {environment} from "../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {User} from "../model/user";
-import {Observable, of} from "rxjs";
 import {catchError, map} from "rxjs/operators";
+import {ErrorHandlerService} from "../util/error-handler.service";
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,8 @@ export class AuthService {
   private _signupEndpoint = environment.signupEndpoint;
   private _loginEndpoint = environment.loginEndpoint;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+              private errorHandler: ErrorHandlerService) {
   }
 
   /**
@@ -33,7 +34,7 @@ export class AuthService {
               return res;
             }
           },
-          catchError(this.handleError('registerUser', [])))
+          catchError(this.errorHandler.handleError('registerUser', [])))
       );
   }
 
@@ -51,7 +52,7 @@ export class AuthService {
               return res;
             }
           },
-          catchError(this.handleError('loginUser', [])))
+          catchError(this.errorHandler.handleError('loginUser', [])))
       );
   }
 
@@ -69,18 +70,4 @@ export class AuthService {
     return !!localStorage.getItem('token');
   }
 
-  /**
-   * Handle Http operation that failed.
-   * Let the app continue.
-   * @param operation
-   * @param result
-   * @private
-   */
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      console.error(error); // log to console instead send the error to remote logging infrastructure
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
-  }
 }
