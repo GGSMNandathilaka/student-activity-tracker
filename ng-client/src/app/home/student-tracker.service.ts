@@ -8,6 +8,7 @@ import {Activity} from "../core/model/api/activity";
 import {TestClass} from "../core/model/api/test-class";
 import {StudentAttempt} from "../core/model/ui/student-attempt";
 import * as moment from 'moment';
+import {FilterCriteria} from "../core/model/ui/filter-criteria";
 
 @Injectable()
 export class StudentTrackerService {
@@ -16,9 +17,16 @@ export class StudentTrackerService {
   private _classesEndpoint = environment.classesEndpoint;
 
   // keep latest version of Student Attempts array
-  private studentAttemptSubject: BehaviorSubject<StudentAttempt[]> = new BehaviorSubject<StudentAttempt[]>([]);
+  // private studentAttemptSubject: BehaviorSubject<StudentAttempt[]> = new BehaviorSubject<StudentAttempt[]>([]);
+
   private activitiesObs: Observable<Activity[]> = this.getActivities();
   private testClassesObs: Observable<TestClass[]> = this.getTestClasses();
+  private testClassMap: Map<number, string> = new Map();
+  private studentClassMap: Map<string, number[]> = new Map();
+
+  public filterObs: BehaviorSubject<FilterCriteria> = new BehaviorSubject<FilterCriteria>(new FilterCriteria());
+  public studentAttemptObs: Observable<StudentAttempt[]> = this.setStudentAttempts();
+  public chartDataObs: Observable<any> = this.setChartData();
 
   constructor(private http: HttpClient,
               private errorHandler: ErrorHandlerService) {
@@ -49,6 +57,12 @@ export class StudentTrackerService {
       .pipe(
         map((res: any) => {
           if (res) {
+            // create a HashMap which contains unique students and which classes they belong to
+            this.studentClassMap = new Map();
+            this.testClassMap = new Map();
+
+            this.setTestClassesMap(res);
+
             return res;
           }
         }),
@@ -56,42 +70,10 @@ export class StudentTrackerService {
       );
   }
 
-  setStudentAttempts() {
+  setStudentAttempts(): Observable<StudentAttempt[]> {
     // merge observables using combineLatest RxJs operator
-    if (this.activitiesObs && this.testClassesObs) {
-      combineLatest([this.activitiesObs, this.testClassesObs]).subscribe(
-        (([activities, testClasses]) => {
-
-          // create a HashMap which contains unique students and which classes they belong to
-          const studentClassMap: Map<string, number[]> = new Map();
-          const testClassMap: Map<number, string> = new Map();
-
-          if (testClasses && testClasses.length > 0) {
-            testClasses.map(testClass => {
-
-              if (testClass) {
-
-                // create a student against classes-array Map
-                if (testClass.students && testClass.students.length > 0) {
-                  testClass.students.map(student => {
-                    if (!studentClassMap.has(student)) {
-                      studentClassMap.set(student, [testClass.id]);
-                    } else {
-                      if (studentClassMap.get(student)) {
-                        studentClassMap.get(student)?.push(testClass.id);
-                      }
-                    }
-                  });
-                }
-
-                // create a class id & name Map
-                if (testClass.id && testClass.name) {
-                  testClassMap.set(testClass.id, testClass.name);
-                }
-
-              }
-            });
-          }
+    return combineLatest([this.activitiesObs, this.testClassesObs, this.filterObs]).pipe(
+      map((([activities, testClasses, filterCriteria]) => {
 
           // flatten API response and create a view model
           const studentAttemptList: StudentAttempt[] = [];
@@ -104,31 +86,135 @@ export class StudentTrackerService {
                 // Here I have merged week & values array and create a flat array.
 
                 activity.attempts.weeks.map((date, index) => {
+
                   let studentAttempt: StudentAttempt = new StudentAttempt();
-                  const dateStr: string[] = date.split("/");
+
+                  // filter logic runs here
+                  if (filterCriteria.classId !== undefined || filterCriteria.student || filterCriteria.fromDate || filterCriteria.toDate) {
+
+                    // class filter
+                    if ('' + filterCriteria.classId) {
+                      const classIds: number[] = this.studentClassMap.get(activity.student) || [];
+                      if (!classIds.includes(+filterCriteria.classId)) {
+                        return;
+                      }
+                    }
+
+                    // student filter
+                    if (filterCriteria.student) {
+                      if (activity.student !== filterCriteria.student) {
+                        return;
+                      }
+                    }
+
+                    // from date filter
+                    if (filterCriteria.fromDate) {
+                      if (moment(date, "DD/MM/YY").toDate() < moment(filterCriteria.fromDate, "YYYY/MM/DD").toDate()) {
+                        return;
+                      }
+                    }
+
+                    // to date filter
+                    if (filterCriteria.toDate) {
+                      if (moment(date, "DD/MM/YY").toDate() > moment(filterCriteria.toDate, "YYYY/MM/DD").toDate()) {
+                        return;
+                      }
+                    }
+
+                  }
 
                   studentAttempt = {
                     ...activity,
                     attemptDate: moment(date, "DD/MM/YY").toDate(),
                     attemptScore: activity.attempts.values[index],
-                    classIds: studentClassMap.get(activity.student)
+                    classIds: this.studentClassMap.get(activity.student)
                   }
-
                   studentAttemptList.push(studentAttempt);
                 });
               }
             });
           }
 
-          this.studentAttemptSubject.next(studentAttemptList);
+          return studentAttemptList;
 
         })
-      );
-    }
+      )
+    );
   }
 
-  getStudentAttempts(): Observable<StudentAttempt[]> {
+  setChartData() {
+    return this.studentAttemptObs.pipe(
+      map((data: StudentAttempt[]) => {
+        if (data) {
+          return data.reduce((previous, current) => {
+            if (current.attemptScore < 60) {
+              previous['weak']++
+            } else if (current.attemptScore < 80) {
+              previous['ok']++
+            } else if (current.attemptScore < 90) {
+              previous['good']++
+            } else if (current.attemptScore < 100) {
+              previous['excellent']++
+            }
+
+            previous['total']++
+            return previous;
+          }, {
+            excellent: 0,
+            good: 0,
+            ok: 0,
+            weak: 0,
+            total: 0
+          });
+        }
+      })
+    );
+  }
+
+  /*getStudentAttempts(): Observable<StudentAttempt[]> {
     return this.studentAttemptSubject;
+  }*/
+
+  getTestClassMap(): Map<number, string> {
+    return this.testClassMap;
+  }
+
+  getStudentClassMap(): Map<string, number[]> {
+    return this.studentClassMap;
+  }
+
+  /**
+   * Create testClass Map & student-testClass Map
+   * @param testClasses
+   */
+  setTestClassesMap(testClasses: TestClass[]) {
+    if (testClasses && testClasses.length > 0) {
+      testClasses.map(testClass => {
+
+        if (testClass) {
+
+          // create a student against classes-array Map
+          if (testClass.students && testClass.students.length > 0) {
+            testClass.students.map(student => {
+              if (!this.studentClassMap.has(student)) {
+                this.studentClassMap.set(student, [testClass.id]);
+              } else {
+                if (this.studentClassMap.get(student)) {
+                  this.studentClassMap.get(student)?.push(testClass.id);
+                }
+              }
+            });
+          }
+
+          // create a class id & name Map
+          if (testClass.id && testClass.name) {
+            this.testClassMap.set(testClass.id, testClass.name);
+          }
+
+        }
+      });
+    }
+
   }
 
 

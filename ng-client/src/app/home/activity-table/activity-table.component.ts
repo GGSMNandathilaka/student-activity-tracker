@@ -16,11 +16,11 @@ export class ActivityTableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.trackerService.getStudentAttempts().subscribe(data => {
+    this.trackerService.studentAttemptObs.subscribe(data => {
       if (data && data.length > 0) {
         this.isDataLoaded = true;
       }
-    })
+    });
   }
 
 }

@@ -22,7 +22,7 @@
             class="text-gray-600 text-sm font-light" style="height: 50vh;">
 
           <ng-container *ngIf="isDataLoaded; else dataLoaderElse">
-            <ng-container *ngFor="let attempt of trackerService.getStudentAttempts() | async; let i = index">
+            <ng-container *ngFor="let attempt of trackerService.studentAttemptObs | async; let i = index">
               <tr class="border-b border-gray-200 hover:bg-gray-100">
 
                 <!-------------------Row Index------------------->
@@ -59,7 +59,7 @@
                 <!-------------------Result------------------->
                 <td class="py-3 px-6 text-left whitespace-nowrap">
                   <div class="flex items-center">
-                    <span class="font-medium">{{attempt?.attemptScore}}%</span>
+                    <span class="font-medium" [scoreHighlight]="attempt.attemptScore">{{attempt?.attemptScore}}%</span>
                   </div>
                 </td>
                 <!-------------------Time Spent------------------->
