@@ -1,1 +1,91 @@
-<p>activity-table works!</p>
+<div class="overflow-x-auto">
+  <div
+    class="min-w-screen min-h-screen bg-gray-100 flex items-center justify-center bg-gray-100 font-sans overflow-hidden">
+    <div class="w-full lg:w-5/6">
+      <div class="bg-white shadow-md rounded my-6">
+
+        <table class="min-w-max w-full table-auto">
+          <thead>
+          <tr
+            class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+            <ng-container *ngFor="let heading of headings">
+              <th
+                class="py-3 px-6 text-left">
+                {{heading}}
+              </th>
+            </ng-container>
+          </tr>
+          </thead>
+
+
+          <tbody
+            class="text-gray-600 text-sm font-light" style="height: 50vh;">
+
+          <ng-container *ngIf="isDataLoaded; else dataLoaderElse">
+            <ng-container *ngFor="let attempt of trackerService.getStudentAttempts() | async; let i = index">
+              <tr class="border-b border-gray-200 hover:bg-gray-100">
+
+                <!-------------------Row Index------------------->
+                <td class="py-3 px-6 text-left whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="font-medium">{{i}}</span>
+                  </div>
+                </td>
+
+                <!-------------------Date Completed------------------->
+                <td class="py-3 px-6 text-left whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="font-medium">{{attempt?.attemptDate | date}}</span>
+                  </div>
+                </td>
+                <!-------------------Content------------------->
+                <td class="py-3 px-6 text-left whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="font-medium">{{attempt?.content}}</span>
+                  </div>
+                </td>
+                <!-------------------Type------------------->
+                <td class="py-3 px-6 text-left whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="font-medium">{{attempt?.type}}</span>
+                  </div>
+                </td>
+                <!-------------------Skill------------------->
+                <td class="py-3 px-6 text-left whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="font-medium">{{attempt?.skill}}</span>
+                  </div>
+                </td>
+                <!-------------------Result------------------->
+                <td class="py-3 px-6 text-left whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="font-medium">{{attempt?.attemptScore}}%</span>
+                  </div>
+                </td>
+                <!-------------------Time Spent------------------->
+                <td class="py-3 px-6 text-left whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="font-medium">{{attempt?.time}}</span>
+                  </div>
+                </td>
+
+              </tr>
+            </ng-container>
+          </ng-container>
+
+          <!--------------Data loader-------------->
+          <ng-template #dataLoaderElse>
+            <div>
+              <div class="w-16 h-16 border-4 border-blue-400 border-dashed rounded-full animate-spin text-center"></div>
+            </div>
+          </ng-template>
+
+          </tbody>
+
+
+        </table>
+
+      </div>
+    </div>
+  </div>
+</div>

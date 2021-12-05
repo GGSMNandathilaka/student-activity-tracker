@@ -1,6 +1,6 @@
 <app-header></app-header>
 
-<div *ngFor="let attempt of trackerService.getStudentAttempts() | async; let i = index">
-  <div>{{i}} - {{attempt.attemptDate | date}} - {{attempt.attemptScore}}</div>
+<div class="antialiased sans-serif bg-gray-200 h-screen">
+  <app-activity-table></app-activity-table>
 </div>
 
