@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {environment} from "../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
-import {User} from "../model/user";
+import {User} from "../model/api/user";
 import {catchError, map} from "rxjs/operators";
 import {ErrorHandlerService} from "../util/error-handler.service";
 
