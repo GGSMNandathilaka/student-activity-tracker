@@ -1,0 +1,51 @@
+<div class="overflow-x-auto">
+  <div
+    class="min-w-screen flex items-center justify-center bg-gray-100 font-sans overflow-hidden">
+    <div class="w-full lg:w-5/6">
+      <div class="rounded my-6">
+
+        <div class="text-center text-gray-900 font-semibold uppercase text-lg leading-normal p-5"
+             *ngIf="filterData.fromDate && filterData.toDate; else dateElse">
+          <div>Overall results for the period:</div>
+          <div>{{filterData.fromDate}} - {{filterData.toDate}}</div>
+        </div>
+
+        <ng-template #dateElse>
+          <div class="text-center text-gray-900 font-semibold uppercase text-lg leading-normal p-5">
+            <div>Overall results for the period:</div>
+            <div>{{today}} - {{today}}</div>
+          </div>
+        </ng-template>
+
+      </div>
+
+      <div style="display:flex" class="text-center items-center pl-52 pr-52 2xl:py-4"
+           *ngIf="trackerService.chartDataObs | async as chartData">
+        <div [ngStyle]="{'flex': (chartData.weak/chartData.total)}" class="bg-red-600 h-6"></div>
+        <div [ngStyle]="{'flex': (chartData.ok/chartData.total)}" class="bg-yellow-600 h-6"></div>
+        <div [ngStyle]="{'flex': (chartData.good/chartData.total)}" class="bg-yellow-400 h-6"></div>
+        <div [ngStyle]="{'flex': (chartData.excellent/chartData.total)}" class="bg-green-700 h-6"></div>
+      </div>
+      <div class="flex space-x-4 text-center items-center  pl-52 pr-52 pb-4"
+           *ngIf="trackerService.chartDataObs | async as chartData">
+        <div class="flex space-x-4">
+          <div class="bg-red-600 h-6 w-6"></div>
+          <div>Weak ({{(chartData.weak / chartData.total) * 100 | number}}%)</div>
+        </div>
+        <div class="flex space-x-4">
+          <div class="bg-yellow-600 h-6 w-6"></div>
+          <div>Ok ({{(chartData.ok / chartData.total) * 100 | number}}%)</div>
+        </div>
+        <div class="flex space-x-4">
+          <div class="bg-yellow-400 h-6 w-6"></div>
+          <div>Good ({{(chartData.good / chartData.total) * 100 | number}}%)</div>
+        </div>
+        <div class="flex space-x-4">
+          <div class="bg-green-700 h-6 w-6"></div>
+          <div>Excellent ({{(chartData.excellent / chartData.total) * 100 | number}}%)</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
