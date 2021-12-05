@@ -13,6 +13,11 @@ import {RouterModule} from "@angular/router";
     SignUpComponent,
     HeaderComponent
   ],
+  exports: [
+    HeaderComponent,
+    LoginComponent,
+    SignUpComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,

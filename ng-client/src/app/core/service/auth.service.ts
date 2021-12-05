@@ -55,6 +55,12 @@ export class AuthService {
       );
   }
 
+  logOutUser() {
+    if (this.loggedIn()) {
+      localStorage.removeItem('token');
+    }
+  }
+
   /**
    * Check user logged in or not
    * Check availability of the JWT which is stores in the localStorage
