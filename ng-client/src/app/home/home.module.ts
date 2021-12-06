@@ -6,9 +6,10 @@ import {SharedModule} from "../shared/shared.module";
 import {HomeRouting} from "./home.routing";
 import {StudentTrackerService} from "./student-tracker.service";
 import {ActivityTableComponent} from './activity-table/activity-table.component';
-import {ScoreHighlightDirective} from "./activity-table/directives/score-highlight.directive";
+import {ScoreHighlightDirective} from "./activity-table/score-highlight.directive";
 import {ActivityFilteringComponent} from "./activity-filtering/activity-filtering.component";
 import { StudentReportComponent } from './student-report/student-report.component';
+import { SortPipe } from './activity-filtering/sort.pipe';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { StudentReportComponent } from './student-report/student-report.componen
     ActivityTableComponent,
     ScoreHighlightDirective,
     ActivityFilteringComponent,
-    StudentReportComponent
+    StudentReportComponent,
+    SortPipe
   ],
   imports: [
     CommonModule,

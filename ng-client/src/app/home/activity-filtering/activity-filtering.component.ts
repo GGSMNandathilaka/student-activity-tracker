@@ -21,6 +21,7 @@ export class ActivityFilteringComponent implements OnInit {
 
   maxFromDate = '';
   minToDate = '';
+  studentList: string[] = [];
 
   constructor(public trackerService: StudentTrackerService) {
   }
@@ -37,6 +38,16 @@ export class ActivityFilteringComponent implements OnInit {
         this.trackerService.filterObs.next(data);
       }
     });
+
+    this.trackerService.studentClassMapSubject.subscribe(studentClassMap => {
+      if (studentClassMap && studentClassMap.size > 0) {
+        this.studentList = [];
+        studentClassMap.forEach((value, key) => {
+          this.studentList.push(key);
+        })
+      }
+    })
+
   }
 
 }

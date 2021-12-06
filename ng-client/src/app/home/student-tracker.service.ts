@@ -27,6 +27,7 @@ export class StudentTrackerService {
   public filterObs: BehaviorSubject<FilterCriteria> = new BehaviorSubject<FilterCriteria>(new FilterCriteria());
   public studentAttemptObs: Observable<StudentAttempt[]> = this.setStudentAttempts();
   public chartDataObs: Observable<any> = this.setChartData();
+  public studentClassMapSubject: BehaviorSubject<Map<string, number[]>> = new BehaviorSubject(new Map());
 
   constructor(private http: HttpClient,
               private errorHandler: ErrorHandlerService) {
@@ -205,6 +206,9 @@ export class StudentTrackerService {
               }
             });
           }
+
+          this.studentClassMapSubject.next(this.studentClassMap);
+
 
           // create a class id & name Map
           if (testClass.id && testClass.name) {
