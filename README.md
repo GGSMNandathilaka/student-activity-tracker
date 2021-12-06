@@ -25,8 +25,9 @@ npm run start
 
 ## Back-end app
 
-This is a simple application which is developed using NodeJs & ExpressJs. Mailny there are two endpoints available - /login & /register.
-For the simplicity I have stored user credentials in a in-memory Json file.
+This is a simple application which is developed using NodeJs & ExpressJs. 
+Mailny there are two endpoints available - /login & /register.
+For the simplicity I have stored user credentials in an in-memory Json file.
 Once user login or register JWT will issue.
 
 ## Front-end app
