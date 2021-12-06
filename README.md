@@ -4,7 +4,7 @@ This is a student activity tracker for learning purposes. A teacher wants to be 
 
 ## Installation
 
-This application requires [Node.js](https://nodejs.org/) v10+ to run.
+This application requires [Node.js](https://nodejs.org/) v14+ to run.
 
 Install the dependencies and devDependencies and start the server.
 
